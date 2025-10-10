@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/OVINC-CN/AIPassway/internal/logger"
 	"github.com/OVINC-CN/AIPassway/internal/utils"
@@ -40,7 +41,11 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 	newPath := r.URL.Path[len(serviceKey)+1:]
 
 	// init transport
-	transport := &http.Transport{}
+	transport := &http.Transport{
+		DisableKeepAlives:     true,
+		ResponseHeaderTimeout: time.Duration(utils.GetConfigIntFromEnv("APP_HEADER_TIMEOUT", 60)) * time.Second,
+		IdleConnTimeout:       time.Duration(utils.GetConfigIntFromEnv("APP_IDLE_TIMEOUT", 600)) * time.Second,
+	}
 
 	// init proxy
 	proxyURL := os.Getenv("APP_FORWARD_PROXY_URL")
@@ -69,6 +74,13 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 		if r.URL.RawQuery != "" {
 			req.URL.RawQuery = r.URL.RawQuery
 		}
+		req.Header.Set("Connection", "close")
+	}
+
+	// add response modifier to ensure connection close
+	proxy.ModifyResponse = func(resp *http.Response) error {
+		resp.Header.Set("Connection", "close")
+		return nil
 	}
 
 	// serve the request
