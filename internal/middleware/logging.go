@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/OVINC-CN/AIPassway/internal/logger"
+	"github.com/OVINC-CN/AIPassway/internal/utils"
 )
 
 func LoggingMiddleware(next http.Handler) http.Handler {
@@ -20,14 +21,14 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		// log response
 		duration := time.Since(start)
 		logger.Logger().Infof(
-			"[LoggingMiddleware] %s %s %s %dB %dms %d %dB",
+			"[LoggingMiddleware] %s %s %s %s %dms %d %s",
 			r.RemoteAddr,
 			r.Method,
 			r.URL.String(),
-			r.ContentLength,
+			utils.FormatBytes(r.ContentLength),
 			duration.Milliseconds(),
 			wrappedWriter.statusCode,
-			wrappedWriter.bytesWritten,
+			utils.FormatBytes(wrappedWriter.bytesWritten),
 		)
 	})
 }
