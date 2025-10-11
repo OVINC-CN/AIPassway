@@ -37,7 +37,7 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
-	logger.Logger().Infof("proxying for %s to: %s", r.RemoteAddr, newURL.String())
+	logger.Logger().Infof("proxying to %s", newURL.String())
 
 	// init transport
 	transport := &http.Transport{

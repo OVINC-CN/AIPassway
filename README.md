@@ -4,7 +4,9 @@ A lightweight and flexible dynamic reverse proxy service written in Go.
 
 ## Overview
 
-AIPassway is a dynamic reverse proxy that routes requests to different backend services based on URL path prefixes. It extracts service keys from incoming request paths and forwards them to corresponding backend hosts configured via environment variables.
+AIPassway is a dynamic reverse proxy that routes requests to different backend services based on URL path prefixes. It
+extracts service keys from incoming request paths and forwards them to corresponding backend hosts configured via
+environment variables.
 
 ## Features
 
@@ -35,38 +37,24 @@ Backend Request: GET https://api.example.com/v1/users
 Response forwarded back to client
 ```
 
-## Configuration
+## Environment Variables
 
-Configure backend services using environment variables with the following pattern:
-
-```bash
-APP_REAL_HOST_<SERVICE_KEY>=<BACKEND_URL>
-```
-
-### Environment Variables
-
-| Variable | Description | Required | Example |
-|----------|-------------|----------|---------|
-| `APP_REAL_HOST_<KEY>` | Backend host URL for service key | Yes | `APP_REAL_HOST_API=https://api.example.com` |
-| `APP_FORWARD_PROXY_URL` | Forward proxy URL for outbound requests | No | `http://proxy.example.com:8080` |
+| Variable                | Description                                                        | Required                                                                  | Example                                           |
+|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------|
+| `APP_REAL_HOST_<KEY>`   | Backend host URL for service key                                   | Yes                                                                       | `APP_REAL_HOST_API=https://api.example.com`       |
+| `APP_FORWARD_PROXY_URL` | Forward proxy URL for outbound requests                            | No                                                                        | `http://proxy.example.com:8080`                   |
+| `APP_IDLE_TIMEOUT`      | Idle connection timeout in seconds                                 | No <br/>(default: 600)                                                    | `APP_IDLE_TIMEOUT=600`                            |
+| `APP_HEADER_TIMEOUT`    | Response header timeout in seconds                                 | No <br/>(default: 60)                                                     | `APP_HEADER_TIMEOUT=60`                           |
+| `APP_INTERNAL_NETWORKS` | comma-separated list of internal network CIDRs                     | No <br/>(default: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) | `APP_INTERNAL_NETWORKS=192.168.1.0/24,10.0.0.0/8` |
+| `APP_PUBLIC_AUTH_TOKEN` | token for public authentication (used in X-AI-Passway-Auth header) | No <br/>(default: random uuid4 each reboot)                               | `APP_PUBLIC_AUTH_TOKEN=your_token_here`           |
 
 ## Error Handling
 
+- **401 Unauthorized**: Returned when the `X-AI-Passway-Auth` header is missing or invalid and visiting through public
+  network
 - **501 Not Implemented**: Returned when service key is missing or backend host is not configured
 - **500 Internal Server Error**: Returned when backend host URL parsing fails
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please open an issue in the GitHub repository.

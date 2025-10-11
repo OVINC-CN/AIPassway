@@ -19,7 +19,10 @@ func Serve() {
 	)
 
 	// main proxy handler
-	http.Handle("/", middleware.LoggingMiddleware(http.HandlerFunc(proxy.DynamicProxyHandler)))
+	http.Handle(
+		"/",
+		middleware.PublicAuthMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(proxy.DynamicProxyHandler))),
+	)
 
 	// start server
 	if err := http.ListenAndServe(":8000", nil); err != nil {
