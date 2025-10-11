@@ -24,7 +24,7 @@ func GetConfigIntFromEnv(key string, defaultValue int) int {
 	var intValue int
 	_, err := fmt.Sscanf(envValue, "%d", &intValue)
 	if err != nil {
-		logger.Logger().Warnf("[GetConfigIntFromEnv] parse int from env failed: %s=%s\nerror: %v", key, envValue, err)
+		logger.Logger().Warnf("parse int from env failed: %s=%s\nerror: %v", key, envValue, err)
 		return defaultValue
 	}
 
