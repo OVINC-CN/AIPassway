@@ -23,6 +23,6 @@ func Serve() {
 
 	// start server
 	if err := http.ListenAndServe(":8000", nil); err != nil {
-		logger.Logger().Errorf("[Server] failed to start server\nerror: %v", err)
+		logger.Logger().Errorf("failed to start server\nerror: %v", err)
 	}
 }

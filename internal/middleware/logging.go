@@ -21,7 +21,7 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 		// log response
 		duration := time.Since(start)
 		logger.Logger().Infof(
-			"[LoggingMiddleware] %s %s %s %s %s %d %s",
+			"%s %s %s %s %s %d %s",
 			r.RemoteAddr,
 			r.Method,
 			r.URL.String(),
