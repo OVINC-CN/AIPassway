@@ -39,17 +39,18 @@ Response forwarded back to client
 
 ## Environment Variables
 
-| Variable                | Description                                                        | Required                                                                  | Example                                           |
-|-------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------|
-| `APP_REAL_HOST_<KEY>`   | Backend host URL for service key                                   | Yes                                                                       | `APP_REAL_HOST_API=https://api.example.com`       |
-| `APP_FORWARD_PROXY_URL` | Forward proxy URL for outbound requests                            | No                                                                        | `http://proxy.example.com:8080`                   |
-| `APP_IDLE_TIMEOUT`      | Idle connection timeout in seconds                                 | No <br/>(default: 600)                                                    | `APP_IDLE_TIMEOUT=600`                            |
-| `APP_HEADER_TIMEOUT`    | Response header timeout in seconds                                 | No <br/>(default: 60)                                                     | `APP_HEADER_TIMEOUT=60`                           |
-| `APP_INTERNAL_NETWORKS` | comma-separated list of internal network CIDRs                     | No <br/>(default: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) | `APP_INTERNAL_NETWORKS=192.168.1.0/24,10.0.0.0/8` |
-| `APP_PUBLIC_AUTH_TOKEN` | token for public authentication (used in X-AI-Passway-Auth header) | No <br/>(default: random uuid4 each reboot)                               | `APP_PUBLIC_AUTH_TOKEN=your_token_here`           |
-| `APP_ENABLE_TRACE`      | enable opentelemetry tracing                                       | No <br/>(default: disabled)                                               | `APP_ENABLE_TRACE=true`                           |
-| `APP_SERVICE_NAME`      | service name for tracing                                           | No <br/>(default: ai-passway)                                             | `APP_SERVICE_NAME=my-service`                     |
-| `APP_TRACE_ENDPOINT`    | otlp trace endpoint                                                | No <br/>(default: 127.0.0.1:4317)                                         | `APP_TRACE_ENDPOINT=jaeger:4317`                  |
+| Variable                   | Description                                                        | Required                                                                  | Example                                           |
+|----------------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------|
+| `APP_REAL_HOST_<KEY>`      | Backend host URL for service key                                   | Yes                                                                       | `APP_REAL_HOST_API=https://api.example.com`       |
+| `APP_FORWARD_PROXY_URL`    | Forward proxy URL for outbound requests                            | No                                                                        | `http://proxy.example.com:8080`                   |
+| `APP_IDLE_TIMEOUT`         | Idle connection timeout in seconds                                 | No <br/>(default: 600)                                                    | `APP_IDLE_TIMEOUT=600`                            |
+| `APP_HEADER_TIMEOUT`       | Response header timeout in seconds                                 | No <br/>(default: 60)                                                     | `APP_HEADER_TIMEOUT=60`                           |
+| `APP_INTERNAL_NETWORKS`    | comma-separated list of internal network CIDRs                     | No <br/>(default: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) | `APP_INTERNAL_NETWORKS=192.168.1.0/24,10.0.0.0/8` |
+| `APP_PUBLIC_AUTH_TOKEN`    | token for public authentication (used in X-AI-Passway-Auth header) | No <br/>(default: random uuid4 each reboot)                               | `APP_PUBLIC_AUTH_TOKEN=your_token_here`           |
+| `APP_ENABLE_TRACE`         | enable opentelemetry tracing                                       | No <br/>(default: disabled)                                               | `APP_ENABLE_TRACE=true`                           |
+| `APP_TRACE_ENDPOINT`       | otlp trace endpoint                                                | No <br/>(default: 127.0.0.1:4317)                                         | `APP_TRACE_ENDPOINT=jaeger:4317`                  |
+| `OTEL_SERVICE_NAME`        | service name for tracing                                           | No <br/>(default: ai-passway)                                             | `APP_SERVICE_NAME=my-service`                     |
+| `OTEL_RESOURCE_ATTRIBUTES` | resource attributes for tracing, comma-separated key-value pairs   | No <br/>(default: none)                                                   | `OTEL_RESOURCE_ATTRIBUTES=key1=val1,key2=val2`    |
 
 ## Error Handling
 
