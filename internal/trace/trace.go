@@ -23,7 +23,7 @@ func init() {
 
 	// load config
 	enableTrace := os.Getenv("APP_ENABLE_TRACE") != ""
-	serviceName := os.Getenv("APP_SERVICE_NAME")
+	serviceName := os.Getenv("OTEL_SERVICE_NAME")
 	if serviceName == "" {
 		serviceName = "ai-passway"
 	}
@@ -33,7 +33,11 @@ func init() {
 	}
 
 	// resource
-	r, err := resource.New(ctx, resource.WithAttributes(semconv.ServiceName(serviceName)))
+	// other use OTEL_RESOURCE_ATTRIBUTES
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(semconv.SchemaURL, semconv.ServiceName(serviceName)),
+	)
 	if err != nil {
 		log.Fatalf("[Trace] create resource failed; %s", err)
 	}
