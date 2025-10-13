@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/OVINC-CN/AIPassway/internal/logger"
+	"github.com/OVINC-CN/AIPassway/internal/trace"
 	"github.com/OVINC-CN/AIPassway/internal/utils"
 	"github.com/google/uuid"
 )
@@ -69,6 +70,11 @@ func isInternalNetwork(clientIP string) bool {
 
 func PublicAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// trace
+		ctx, span := trace.StartSpan(r.Context(), "PublicAuthMiddleware", trace.SpanKindInternal)
+		defer span.End()
+		r = r.WithContext(ctx)
+
 		// get client ip address
 		clientIP := utils.GetClientIP(r)
 
@@ -83,6 +89,9 @@ func PublicAuthMiddleware(next http.Handler) http.Handler {
 		} else {
 			logger.Logger().Infof("internal access from %s", clientIP)
 		}
+
+		// stop span
+		span.End()
 
 		// call the next handler
 		next.ServeHTTP(w, r)
