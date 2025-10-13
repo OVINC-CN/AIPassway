@@ -9,13 +9,22 @@ import (
 	"time"
 
 	"github.com/OVINC-CN/AIPassway/internal/logger"
+	"github.com/OVINC-CN/AIPassway/internal/trace"
 	"github.com/OVINC-CN/AIPassway/internal/utils"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
 func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
+	// trace
+	ctx, span := trace.StartSpan(r.Context(), "DynamicProxyHandler", trace.SpanKindInternal)
+	defer span.End()
+	r = r.WithContext(ctx)
+
 	// extract service key from URL path
 	pathParts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	if len(pathParts) == 0 || pathParts[0] == "" {
+		span.SetStatus(codes.Error, "service key not found in path")
 		http.Error(w, "", http.StatusNotImplemented)
 		return
 	}
@@ -24,20 +33,28 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 	serviceKey := pathParts[0]
 	realHostStr := utils.GetRealHostFromEnv(serviceKey)
 	if realHostStr == "" {
+		span.SetStatus(codes.Error, "service not found")
 		http.Error(w, "", http.StatusNotImplemented)
 		return
 	}
+	span.SetAttributes(
+		attribute.String("service.key", serviceKey),
+		attribute.String("proxy.base_url", realHostStr),
+	)
 
 	// parse real host url
 	newPath := r.URL.Path[len(serviceKey)+1:]
 	newURLStr := strings.TrimSuffix(realHostStr, "/") + newPath
 	newURL, err := url.Parse(newURLStr)
 	if err != nil {
+		span.SetStatus(codes.Error, err.Error())
+		span.RecordError(err)
 		logger.Logger().Errorf("parse new url failed: %s\nerror: %v", newURLStr, err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 	logger.Logger().Infof("proxying to %s", newURL.String())
+	span.SetAttributes(attribute.String("proxy.full_url", newURL.String()))
 
 	// init transport
 	transport := &http.Transport{
@@ -88,6 +105,8 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 
 	// error handler
 	proxy.ErrorHandler = func(rw http.ResponseWriter, req *http.Request, err error) {
+		span.SetStatus(codes.Error, err.Error())
+		span.RecordError(err)
 		logger.Logger().Errorf("proxy error: %v", err)
 		http.Error(rw, "", http.StatusBadGateway)
 	}

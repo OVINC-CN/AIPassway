@@ -21,7 +21,7 @@ func Serve() {
 	// main proxy handler
 	http.Handle(
 		"/",
-		middleware.PublicAuthMiddleware(middleware.LoggingMiddleware(http.HandlerFunc(proxy.DynamicProxyHandler))),
+		middleware.LoggingMiddleware(middleware.PublicAuthMiddleware(http.HandlerFunc(proxy.DynamicProxyHandler))),
 	)
 
 	// start server

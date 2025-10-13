@@ -47,6 +47,9 @@ Response forwarded back to client
 | `APP_HEADER_TIMEOUT`    | Response header timeout in seconds                                 | No <br/>(default: 60)                                                     | `APP_HEADER_TIMEOUT=60`                           |
 | `APP_INTERNAL_NETWORKS` | comma-separated list of internal network CIDRs                     | No <br/>(default: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) | `APP_INTERNAL_NETWORKS=192.168.1.0/24,10.0.0.0/8` |
 | `APP_PUBLIC_AUTH_TOKEN` | token for public authentication (used in X-AI-Passway-Auth header) | No <br/>(default: random uuid4 each reboot)                               | `APP_PUBLIC_AUTH_TOKEN=your_token_here`           |
+| `APP_ENABLE_TRACE`      | enable opentelemetry tracing                                       | No <br/>(default: disabled)                                               | `APP_ENABLE_TRACE=true`                           |
+| `APP_SERVICE_NAME`      | service name for tracing                                           | No <br/>(default: ai-passway)                                             | `APP_SERVICE_NAME=my-service`                     |
+| `APP_TRACE_ENDPOINT`    | otlp trace endpoint                                                | No <br/>(default: 127.0.0.1:4317)                                         | `APP_TRACE_ENDPOINT=jaeger:4317`                  |
 
 ## Error Handling
 
