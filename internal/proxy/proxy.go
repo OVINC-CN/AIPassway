@@ -11,6 +11,7 @@ import (
 	"github.com/OVINC-CN/AIPassway/internal/logger"
 	"github.com/OVINC-CN/AIPassway/internal/trace"
 	"github.com/OVINC-CN/AIPassway/internal/utils"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 )
@@ -57,23 +58,25 @@ func DynamicProxyHandler(w http.ResponseWriter, r *http.Request) {
 	span.SetAttributes(attribute.String("proxy.full_url", newURL.String()))
 
 	// init transport
-	transport := &http.Transport{
-		// proxy
-		Proxy: func(*http.Request) (*url.URL, error) {
-			proxyURL := os.Getenv("APP_FORWARD_PROXY_URL")
-			if proxyURL == "" {
-				return nil, nil
-			}
-			return url.Parse(proxyURL)
+	transport := otelhttp.NewTransport(
+		&http.Transport{
+			// proxy
+			Proxy: func(*http.Request) (*url.URL, error) {
+				proxyURL := os.Getenv("APP_FORWARD_PROXY_URL")
+				if proxyURL == "" {
+					return nil, nil
+				}
+				return url.Parse(proxyURL)
+			},
+			// close connections after use
+			DisableKeepAlives: true,
+			// enable compression
+			DisableCompression: false,
+			// timeout
+			IdleConnTimeout:       time.Duration(utils.GetConfigIntFromEnv("APP_IDLE_TIMEOUT", 600)) * time.Second,
+			ResponseHeaderTimeout: time.Duration(utils.GetConfigIntFromEnv("APP_HEADER_TIMEOUT", 60)) * time.Second,
 		},
-		// close connections after use
-		DisableKeepAlives: true,
-		// enable compression
-		DisableCompression: false,
-		// timeout
-		IdleConnTimeout:       time.Duration(utils.GetConfigIntFromEnv("APP_IDLE_TIMEOUT", 600)) * time.Second,
-		ResponseHeaderTimeout: time.Duration(utils.GetConfigIntFromEnv("APP_HEADER_TIMEOUT", 60)) * time.Second,
-	}
+	)
 
 	// create reverse proxy
 	proxy := httputil.NewSingleHostReverseProxy(newURL)
