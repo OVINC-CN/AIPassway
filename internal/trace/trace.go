@@ -42,18 +42,23 @@ func init() {
 		log.Fatalf("[Trace] create resource failed; %s", err)
 	}
 
-	// init ops
-	ops := []sdktrace.TracerProviderOption{sdktrace.WithResource(r)}
+	// init exporter
+	var exporter sdktrace.SpanExporter
 	if enableTrace {
-		e, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint(traceEndpoint), otlptracegrpc.WithInsecure())
+		var err error
+		exporter, err = otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint(traceEndpoint), otlptracegrpc.WithInsecure())
 		if err != nil {
 			log.Fatalf("[Trace] create otlp grpc exporter failed; %s", err)
 		}
-		ops = append(ops, sdktrace.WithBatcher(e))
+	} else {
+		exporter = newNoopExporter()
 	}
 
 	// init trace provider
-	traceProvider = sdktrace.NewTracerProvider(ops...)
+	traceProvider = sdktrace.NewTracerProvider(
+		sdktrace.WithResource(r),
+		sdktrace.WithBatcher(exporter),
+	)
 	otel.SetTracerProvider(traceProvider)
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
